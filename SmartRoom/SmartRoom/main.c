@@ -85,7 +85,7 @@ void lcd_init(void)
     t.Day = Sunday;
     t.Date = 31;
     t.Month = 12;
-    t.Year = 2023;
+    t.Year = 2024;
     RTC_Set(t);
 
     lq_setCursor(&lcd1, 0, 13);
