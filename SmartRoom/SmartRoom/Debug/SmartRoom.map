@@ -1061,7 +1061,7 @@ END GROUP
  .debug_frame   0x000005f4       0xf0 lib/TWI_lib.o
  .debug_frame   0x000006e4      0x324 main.o
 
-.debug_str      0x00000000     0x1014
+.debug_str      0x00000000     0x105b
  *(.debug_str)
  .debug_str     0x00000000      0x196 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.132/gcc/dev/atmega32/avr5/crtatmega32.o
  .debug_str     0x00000196      0x786 lib/DS3232_lib.o
@@ -1074,8 +1074,8 @@ END GROUP
                                 0x19c (size before relaxing)
  .debug_str     0x00000cfc       0x7f lib/TWI_lib.o
                                 0x3b0 (size before relaxing)
- .debug_str     0x00000d7b      0x299 main.o
-                                0x65a (size before relaxing)
+ .debug_str     0x00000d7b      0x2e0 main.o
+                                0x668 (size before relaxing)
 
 .debug_loc      0x00000000     0x2bbf
  *(.debug_loc)

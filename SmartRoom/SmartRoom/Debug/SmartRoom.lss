@@ -23,11 +23,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  00000a08  00000000  00000000  00008fb8  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00001014  00000000  00000000  000099c0  2**0
+ 10 .debug_str    0000105b  00000000  00000000  000099c0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00002bbf  00000000  00000000  0000a9d4  2**0
+ 11 .debug_loc    00002bbf  00000000  00000000  0000aa1b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000350  00000000  00000000  0000d593  2**0
+ 12 .debug_ranges 00000350  00000000  00000000  0000d5da  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -104,12 +104,6 @@ Disassembly of section .text:
       9a:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 0000009e <Dec2bcd>:
-		BitSet(reg, flag);
-	RTC_WriteByte(addr, reg);
-
-	//Return bit
-	return r;
-}
       9e:	9a e1       	ldi	r25, 0x1A	; 26
       a0:	89 9f       	mul	r24, r25
       a2:	90 01       	movw	r18, r0
@@ -291,12 +285,6 @@ Disassembly of section .text:
      240:	08 95       	ret
 
 00000242 <RTC_Set>:
-	__I2C_Stop();
-}
-
-//Set datetime. 
-void RTC_Set(DateTime_t Value)
-{
      242:	af 92       	push	r10
      244:	bf 92       	push	r11
      246:	cf 92       	push	r12
@@ -321,53 +309,41 @@ void RTC_Set(DateTime_t Value)
      26c:	d6 2e       	mov	r13, r22
      26e:	e7 2e       	mov	r14, r23
      270:	f8 2e       	mov	r15, r24
-	//Prepare transmission buffer
-	__RTC_Buffer[0] = Dec2bcd(Value.Second);
      272:	82 2f       	mov	r24, r18
      274:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      278:	0d eb       	ldi	r16, 0xBD	; 189
      27a:	12 e0       	ldi	r17, 0x02	; 2
      27c:	f8 01       	movw	r30, r16
      27e:	80 83       	st	Z, r24
-	__RTC_Buffer[1] = Dec2bcd(Value.Minute);
      280:	8a 2d       	mov	r24, r10
      282:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      286:	f8 01       	movw	r30, r16
      288:	81 83       	std	Z+1, r24	; 0x01
-	__RTC_Buffer[2] = Dec2bcd(Value.Hour);
      28a:	8b 2d       	mov	r24, r11
      28c:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      290:	f8 01       	movw	r30, r16
      292:	82 83       	std	Z+2, r24	; 0x02
-	__RTC_Buffer[3] = Dec2bcd(Value.Day);
      294:	8c 2d       	mov	r24, r12
      296:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      29a:	f8 01       	movw	r30, r16
      29c:	83 83       	std	Z+3, r24	; 0x03
-	__RTC_Buffer[4] = Dec2bcd(Value.Date);
      29e:	8d 2d       	mov	r24, r13
      2a0:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      2a4:	f8 01       	movw	r30, r16
      2a6:	84 83       	std	Z+4, r24	; 0x04
-	__RTC_Buffer[5] = Dec2bcd(Value.Month);
      2a8:	8e 2d       	mov	r24, r14
      2aa:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      2ae:	f8 01       	movw	r30, r16
      2b0:	85 83       	std	Z+5, r24	; 0x05
-	__RTC_Buffer[6] = Dec2bcd(__RTC_y2kToTm(Value.Year));
      2b2:	80 e3       	ldi	r24, 0x30	; 48
      2b4:	8f 0d       	add	r24, r15
      2b6:	0e 94 4f 00 	call	0x9e	; 0x9e <Dec2bcd>
      2ba:	f8 01       	movw	r30, r16
      2bc:	86 83       	std	Z+6, r24	; 0x06
-
-	//Transmit buffer
-	RTC_WriteBlock(__RTC_Address_Seconds, __RTC_Buffer, __RTC_Buffer_Length);
      2be:	47 e0       	ldi	r20, 0x07	; 7
      2c0:	b8 01       	movw	r22, r16
      2c2:	80 e0       	ldi	r24, 0x00	; 0
      2c4:	0e 94 5c 00 	call	0xb8	; 0xb8 <RTC_WriteBlock>
-}
      2c8:	28 96       	adiw	r28, 0x08	; 8
      2ca:	0f b6       	in	r0, 0x3f	; 63
      2cc:	f8 94       	cli
@@ -387,10 +363,6 @@ void RTC_Set(DateTime_t Value)
      2e8:	08 95       	ret
 
 000002ea <RTC_Get>:
-
-//Get datetime. 
-DateTime_t RTC_Get(void)
-{
      2ea:	cf 93       	push	r28
      2ec:	df 93       	push	r29
      2ee:	cd b7       	in	r28, 0x3d	; 61
@@ -401,36 +373,21 @@ DateTime_t RTC_Get(void)
      2f8:	de bf       	out	0x3e, r29	; 62
      2fa:	0f be       	out	0x3f, r0	; 63
      2fc:	cd bf       	out	0x3d, r28	; 61
-	DateTime_t value;
-
-	//Read DATA into buffer
-	RTC_ReadBlock(__RTC_Address_Seconds, __RTC_Buffer, __RTC_Buffer_Length);
      2fe:	47 e0       	ldi	r20, 0x07	; 7
      300:	6d eb       	ldi	r22, 0xBD	; 189
      302:	72 e0       	ldi	r23, 0x02	; 2
      304:	80 e0       	ldi	r24, 0x00	; 0
      306:	0e 94 ab 00 	call	0x156	; 0x156 <RTC_ReadBlock>
-		
-	//Build time_t variable
-	value.Second = Bcd2dec(__RTC_Buffer[0]);
      30a:	ed eb       	ldi	r30, 0xBD	; 189
      30c:	f2 e0       	ldi	r31, 0x02	; 2
      30e:	20 81       	ld	r18, Z
-	value.Minute = Bcd2dec(__RTC_Buffer[1]);
      310:	31 81       	ldd	r19, Z+1	; 0x01
-	value.Hour = Bcd2dec(__RTC_Buffer[2] & 0x3F);
      312:	42 81       	ldd	r20, Z+2	; 0x02
      314:	4f 73       	andi	r20, 0x3F	; 63
-	value.Day = Bcd2dec(__RTC_Buffer[3]);
      316:	53 81       	ldd	r21, Z+3	; 0x03
-	value.Date = Bcd2dec(__RTC_Buffer[4]);
      318:	64 81       	ldd	r22, Z+4	; 0x04
-	value.Month = Bcd2dec(__RTC_Buffer[5]);
      31a:	75 81       	ldd	r23, Z+5	; 0x05
-	value.Year = __RTC_tmToY2k(Bcd2dec(__RTC_Buffer[6]));
      31c:	86 81       	ldd	r24, Z+6	; 0x06
-
-	return value;
      31e:	92 2f       	mov	r25, r18
      320:	92 95       	swap	r25
      322:	9f 70       	andi	r25, 0x0F	; 15
@@ -492,7 +449,6 @@ DateTime_t RTC_Get(void)
      392:	98 4f       	sbci	r25, 0xF8	; 248
      394:	98 87       	std	Y+8, r25	; 0x08
      396:	8f 83       	std	Y+7, r24	; 0x07
-}
      398:	98 85       	ldd	r25, Y+8	; 0x08
      39a:	28 96       	adiw	r28, 0x08	; 8
      39c:	0f b6       	in	r0, 0x3f	; 63
@@ -505,12 +461,6 @@ DateTime_t RTC_Get(void)
      3aa:	08 95       	ret
 
 000003ac <i2c_master_init>:
-	}
-	
-	i2c_master_stop();
-	
-	return I2C_STATUS_SUCCESS;
-}
      3ac:	9b 01       	movw	r18, r22
      3ae:	ac 01       	movw	r20, r24
      3b0:	11 b8       	out	0x01, r1	; 1
@@ -584,48 +534,22 @@ DateTime_t RTC_Get(void)
      432:	08 95       	ret
 
 00000434 <i2c_master_sendByte>:
-
-uint8_t i2c_master_sendByte(uint8_t address, uint8_t data)
-{
      434:	cf 93       	push	r28
      436:	c6 2f       	mov	r28, r22
-	uint8_t status = i2c_master_start(address, I2C_WRITE);
      438:	60 e0       	ldi	r22, 0x00	; 0
      43a:	0e 94 ea 01 	call	0x3d4	; 0x3d4 <i2c_master_start>
-	if (status) return status;
      43e:	81 11       	cpse	r24, r1
      440:	07 c0       	rjmp	.+14     	; 0x450 <i2c_master_sendByte+0x1c>
-
-	status = i2c_master_write(data);
      442:	8c 2f       	mov	r24, r28
      444:	0e 94 0c 02 	call	0x418	; 0x418 <i2c_master_write>
-	if (status) return status;
      448:	81 11       	cpse	r24, r1
      44a:	02 c0       	rjmp	.+4      	; 0x450 <i2c_master_sendByte+0x1c>
-	return I2C_STATUS_SUCCESS;
-}
-
-void i2c_master_stop(void)
-{
-	TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
      44c:	94 e9       	ldi	r25, 0x94	; 148
      44e:	96 bf       	out	0x36, r25	; 54
-	if (status) return status;
-
-	i2c_master_stop();
-	
-	return I2C_STATUS_SUCCESS;
-};
      450:	cf 91       	pop	r28
      452:	08 95       	ret
 
 00000454 <lq_transmitI2C>:
-
-	for (i = 0; i < 8; i++)
-	{
-		lq_writeDeviceByte(device, charmap[i], LCD_REGISTER_SELECT_BIT);
-	}
-}
      454:	fc 01       	movw	r30, r24
      456:	93 81       	ldd	r25, Z+3	; 0x03
      458:	69 2b       	or	r22, r25
@@ -797,12 +721,6 @@ void i2c_master_stop(void)
      59c:	08 95       	ret
 
 0000059e <lq_init>:
-
-#include <avr/io.h>
-#include <util/delay.h>
-
-LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, uint8_t dotSize)
-{
      59e:	cf 93       	push	r28
      5a0:	df 93       	push	r29
      5a2:	cd b7       	in	r28, 0x3d	; 61
@@ -813,43 +731,24 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      5ac:	de bf       	out	0x3e, r29	; 62
      5ae:	0f be       	out	0x3f, r0	; 63
      5b0:	cd bf       	out	0x3d, r28	; 61
-	LiquidCrystalDevice_t device;
-
-	device.Address = address;
      5b2:	88 87       	std	Y+8, r24	; 0x08
-	device.Columns = columns;
      5b4:	69 87       	std	Y+9, r22	; 0x09
-	device.Rows = rows;
      5b6:	4a 87       	std	Y+10, r20	; 0x0a
-	device.Backlight = LCD_NOBACKLIGHT;
      5b8:	1b 86       	std	Y+11, r1	; 0x0b
-	device.DisplayFunction = LCD_4BITMODE | LCD_1LINE | dotSize;
      5ba:	2c 87       	std	Y+12, r18	; 0x0c
-	device.DisplayControl = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
      5bc:	84 e0       	ldi	r24, 0x04	; 4
      5be:	8d 87       	std	Y+13, r24	; 0x0d
-
-	// Initialize to default text direction (for roman languages)
-	device.DisplayMode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
      5c0:	82 e0       	ldi	r24, 0x02	; 2
      5c2:	8e 87       	std	Y+14, r24	; 0x0e
-
-	if (rows > 1) {
      5c4:	42 30       	cpi	r20, 0x02	; 2
      5c6:	18 f0       	brcs	.+6      	; 0x5ce <lq_init+0x30>
-		device.DisplayFunction |= LCD_2LINE;
      5c8:	82 2f       	mov	r24, r18
      5ca:	88 60       	ori	r24, 0x08	; 8
      5cc:	8c 87       	std	Y+12, r24	; 0x0c
-	}
-
-	// for some 1 line displays you can select a 10 pixel high font
-	if ((dotSize != 0) && (rows == 1)) {
      5ce:	22 23       	and	r18, r18
      5d0:	29 f0       	breq	.+10     	; 0x5dc <lq_init+0x3e>
      5d2:	41 30       	cpi	r20, 0x01	; 1
      5d4:	19 f4       	brne	.+6      	; 0x5dc <lq_init+0x3e>
-		device.DisplayFunction |= LCD_5x10DOTS;
      5d6:	8c 85       	ldd	r24, Y+12	; 0x0c
      5d8:	84 60       	ori	r24, 0x04	; 4
      5da:	8c 87       	std	Y+12, r24	; 0x0c
@@ -868,12 +767,6 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      5e8:	e1 f7       	brne	.-8      	; 0x5e2 <lq_init+0x44>
      5ea:	00 c0       	rjmp	.+0      	; 0x5ec <lq_init+0x4e>
      5ec:	00 00       	nop
-	// according to datasheet, we need at least 40ms after power rises above 2.7V
-	// before sending commands. Arduino can turn on way befer 4.5V so we'll wait 50
-	_delay_ms(100);
-	
-	// Now we pull both RS and R/W low to begin commands
-	lq_transmitI2C(&device, LCD_NOBACKLIGHT);	// reset expanderand turn backlight off (Bit 8 =1)
      5ee:	60 e0       	ldi	r22, 0x00	; 0
      5f0:	ce 01       	movw	r24, r28
      5f2:	08 96       	adiw	r24, 0x08	; 8
@@ -887,12 +780,6 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      604:	e1 f7       	brne	.-8      	; 0x5fe <lq_init+0x60>
      606:	00 c0       	rjmp	.+0      	; 0x608 <lq_init+0x6a>
      608:	00 00       	nop
-	//put the LCD into 4 bit mode
-	// this is according to the hitachi HD44780 datasheet
-	// figure 24, pg 46
-	
-	// we start in 8bit mode, try to set 4 bit mode
-	lq_transmitI2C(&device, 0x03 << 4);
      60a:	60 e3       	ldi	r22, 0x30	; 48
      60c:	ce 01       	movw	r24, r28
      60e:	08 96       	adiw	r24, 0x08	; 8
@@ -909,10 +796,6 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      61a:	f1 f7       	brne	.-4      	; 0x618 <lq_init+0x7a>
      61c:	00 c0       	rjmp	.+0      	; 0x61e <lq_init+0x80>
      61e:	00 00       	nop
-	_delay_us(4500); // wait min 4.1ms
-	
-	// second try
-	lq_writeDevice4Bits(&device, 0x03 << 4);
      620:	60 e3       	ldi	r22, 0x30	; 48
      622:	ce 01       	movw	r24, r28
      624:	08 96       	adiw	r24, 0x08	; 8
@@ -923,10 +806,6 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      630:	f1 f7       	brne	.-4      	; 0x62e <lq_init+0x90>
      632:	00 c0       	rjmp	.+0      	; 0x634 <lq_init+0x96>
      634:	00 00       	nop
-	_delay_us(4500); // wait min 4.1ms
-	
-	// third go!
-	lq_writeDevice4Bits(&device, 0x03 << 4);
      636:	60 e3       	ldi	r22, 0x30	; 48
      638:	ce 01       	movw	r24, r28
      63a:	08 96       	adiw	r24, 0x08	; 8
@@ -937,49 +816,29 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      646:	f1 f7       	brne	.-4      	; 0x644 <lq_init+0xa6>
      648:	00 c0       	rjmp	.+0      	; 0x64a <lq_init+0xac>
      64a:	00 00       	nop
-	_delay_us(150); // wait min 150 mics
-	
-	// finally, set to 4-bit interface
-	lq_writeDevice4Bits(&device, 0x02 << 4);
      64c:	60 e2       	ldi	r22, 0x20	; 32
      64e:	ce 01       	movw	r24, r28
      650:	08 96       	adiw	r24, 0x08	; 8
      652:	0e 94 4a 02 	call	0x494	; 0x494 <lq_writeDevice4Bits>
-
-	// set # lines, font size, etc.
-	lq_sendCommand(&device, LCD_FUNCTIONSET | device.DisplayFunction);
      656:	6c 85       	ldd	r22, Y+12	; 0x0c
      658:	60 62       	ori	r22, 0x20	; 32
      65a:	ce 01       	movw	r24, r28
      65c:	08 96       	adiw	r24, 0x08	; 8
      65e:	0e 94 87 02 	call	0x50e	; 0x50e <lq_sendCommand>
-	
-	// turn the display on with no cursor or blinking default
-	lq_turnOnDisplay(&device);
      662:	ce 01       	movw	r24, r28
      664:	08 96       	adiw	r24, 0x08	; 8
      666:	0e 94 c6 02 	call	0x58c	; 0x58c <lq_turnOnDisplay>
-	
-	// clear it off
-	lq_clear(&device);
      66a:	ce 01       	movw	r24, r28
      66c:	08 96       	adiw	r24, 0x08	; 8
      66e:	0e 94 a8 02 	call	0x550	; 0x550 <lq_clear>
-	
-	// set the entry mode
-	lq_sendCommand(&device, LCD_ENTRYMODESET | device.DisplayMode);
      672:	6e 85       	ldd	r22, Y+14	; 0x0e
      674:	64 60       	ori	r22, 0x04	; 4
      676:	ce 01       	movw	r24, r28
      678:	08 96       	adiw	r24, 0x08	; 8
      67a:	0e 94 87 02 	call	0x50e	; 0x50e <lq_sendCommand>
-	
-	lq_returnHome(&device);
      67e:	ce 01       	movw	r24, r28
      680:	08 96       	adiw	r24, 0x08	; 8
      682:	0e 94 bc 02 	call	0x578	; 0x578 <lq_returnHome>
-
-	return device;
      686:	87 e0       	ldi	r24, 0x07	; 7
      688:	fe 01       	movw	r30, r28
      68a:	38 96       	adiw	r30, 0x08	; 8
@@ -995,7 +854,6 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      69e:	5c 81       	ldd	r21, Y+4	; 0x04
      6a0:	6d 81       	ldd	r22, Y+5	; 0x05
      6a2:	7e 81       	ldd	r23, Y+6	; 0x06
-};
      6a4:	8f 81       	ldd	r24, Y+7	; 0x07
      6a6:	90 e0       	ldi	r25, 0x00	; 0
      6a8:	2e 96       	adiw	r28, 0x0e	; 14
@@ -1009,215 +867,90 @@ LiquidCrystalDevice_t lq_init(uint8_t address, uint8_t columns, uint8_t rows, ui
      6b8:	08 95       	ret
 
 000006ba <serial_init>:
-
-#include "Serial_lib.h"
-
-void serial_init()
-{
-	UCSRB = (1 << RXEN) | (1 << TXEN);
      6ba:	88 e1       	ldi	r24, 0x18	; 24
      6bc:	8a b9       	out	0x0a, r24	; 10
-	UCSRC |= (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1);
      6be:	80 b5       	in	r24, 0x20	; 32
      6c0:	86 68       	ori	r24, 0x86	; 134
      6c2:	80 bd       	out	0x20, r24	; 32
-	UBRRL = (int)((F_CPU / (SERIAL_BAUD_RATE * 16)) - 1);
      6c4:	83 e3       	ldi	r24, 0x33	; 51
      6c6:	89 b9       	out	0x09, r24	; 9
-	
-#if SERIAL_INTERRUPT == 1
-	UCSRB |= (1<<RXCIE);
      6c8:	57 9a       	sbi	0x0a, 7	; 10
      6ca:	08 95       	ret
 
 000006cc <serial_send_char>:
-#endif
-}
-
-void serial_send_char(char c)
-{
-	UCSRA = 1 << TXC; // clear TXC bit
      6cc:	90 e4       	ldi	r25, 0x40	; 64
      6ce:	9b b9       	out	0x0b, r25	; 11
-	UDR = c;
      6d0:	8c b9       	out	0x0c, r24	; 12
-	while ((UCSRA & (1 << TXC)) == 0);
      6d2:	5e 9b       	sbis	0x0b, 6	; 11
      6d4:	fe cf       	rjmp	.-4      	; 0x6d2 <serial_send_char+0x6>
-}
      6d6:	08 95       	ret
 
 000006d8 <serial_send_string>:
-
-void serial_send_string(char *s)
-{
      6d8:	cf 93       	push	r28
      6da:	df 93       	push	r29
      6dc:	ec 01       	movw	r28, r24
-	while (*s != '\0')
      6de:	88 81       	ld	r24, Y
      6e0:	88 23       	and	r24, r24
      6e2:	31 f0       	breq	.+12     	; 0x6f0 <serial_send_string+0x18>
      6e4:	21 96       	adiw	r28, 0x01	; 1
-	{
-		serial_send_char(*s);
      6e6:	0e 94 66 03 	call	0x6cc	; 0x6cc <serial_send_char>
-	while ((UCSRA & (1 << TXC)) == 0);
-}
-
-void serial_send_string(char *s)
-{
-	while (*s != '\0')
      6ea:	89 91       	ld	r24, Y+
      6ec:	81 11       	cpse	r24, r1
      6ee:	fb cf       	rjmp	.-10     	; 0x6e6 <serial_send_string+0xe>
-	{
-		serial_send_char(*s);
-		s++;
-	}
-}
      6f0:	df 91       	pop	r29
      6f2:	cf 91       	pop	r28
      6f4:	08 95       	ret
 
 000006f6 <TWI_Status>:
-}
-
-//Get TWI status. 
-uint8_t TWI_Status(void)
-{
-	return (TWSR & 0xF8);
      6f6:	81 b1       	in	r24, 0x01	; 1
-}
      6f8:	88 7f       	andi	r24, 0xF8	; 248
      6fa:	08 95       	ret
 
 000006fc <TWI_BeginTransmission>:
-
-//Begin TWI transmission. 
-uint8_t TWI_BeginTransmission(void)
-{
-	//Transmit START condition
-	TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
      6fc:	84 ea       	ldi	r24, 0xA4	; 164
      6fe:	86 bf       	out	0x36, r24	; 54
-
-	//Wait for TWINT Flag set. This indicates that
-	//the START condition has been transmitted.
-	while (!BitCheck(TWCR, TWINT));
      700:	06 b6       	in	r0, 0x36	; 54
      702:	07 fe       	sbrs	r0, 7
      704:	fd cf       	rjmp	.-6      	; 0x700 <TWI_BeginTransmission+0x4>
-}
-
-//Get TWI status. 
-uint8_t TWI_Status(void)
-{
-	return (TWSR & 0xF8);
      706:	81 b1       	in	r24, 0x01	; 1
-	//the START condition has been transmitted.
-	while (!BitCheck(TWCR, TWINT));
-
-	//Return status register
-	return (TWI_Status());
-}
      708:	88 7f       	andi	r24, 0xF8	; 248
      70a:	08 95       	ret
 
 0000070c <TWI_EndTransmission>:
-
-//End TWI transmission. 
-void TWI_EndTransmission(void)
-{
-	//Transmit STOP condition
-	TWCR = (1<<TWEN) | (1<<TWIE) | (1<<TWEA) | (1<<TWINT) | (1<<TWSTO);
      70c:	85 ed       	ldi	r24, 0xD5	; 213
      70e:	86 bf       	out	0x36, r24	; 54
-
-	//Wait for stop condition to be executed on bus
-	//TWINT is not set after a stop condition!
-	while(BitCheck(TWCR, TWSTO));
      710:	06 b6       	in	r0, 0x36	; 54
      712:	04 fc       	sbrc	r0, 4
      714:	fd cf       	rjmp	.-6      	; 0x710 <TWI_EndTransmission+0x4>
-}
      716:	08 95       	ret
 
 00000718 <TWI_Transmit>:
-
-//Transmit data. 
-uint8_t TWI_Transmit(uint8_t Data)
-{
-	//Data to be transmitted
-	TWDR = Data;
      718:	83 b9       	out	0x03, r24	; 3
-
-	//Start transmission
-	TWCR = (1<<TWINT) | (1<<TWEN);
      71a:	84 e8       	ldi	r24, 0x84	; 132
      71c:	86 bf       	out	0x36, r24	; 54
-
-	//Wait data to be shifted
-	while (!BitCheck(TWCR, TWINT));
      71e:	06 b6       	in	r0, 0x36	; 54
      720:	07 fe       	sbrs	r0, 7
      722:	fd cf       	rjmp	.-6      	; 0x71e <TWI_Transmit+0x6>
-}
-
-//Get TWI status. 
-uint8_t TWI_Status(void)
-{
-	return (TWSR & 0xF8);
      724:	81 b1       	in	r24, 0x01	; 1
-	//Wait data to be shifted
-	while (!BitCheck(TWCR, TWINT));
-
-	//Return status register
-	return (TWI_Status());
-}
      726:	88 7f       	andi	r24, 0xF8	; 248
      728:	08 95       	ret
 
 0000072a <TWI_ReceiveACK>:
-
-//Wait until ACK received. 
-uint8_t TWI_ReceiveACK(void)
-{
-	TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
      72a:	84 ec       	ldi	r24, 0xC4	; 196
      72c:	86 bf       	out	0x36, r24	; 54
-	
-	//Wait till reception is
-	while (!BitCheck(TWCR, TWINT));
      72e:	06 b6       	in	r0, 0x36	; 54
      730:	07 fe       	sbrs	r0, 7
      732:	fd cf       	rjmp	.-6      	; 0x72e <TWI_ReceiveACK+0x4>
-
-	//Return received data
-	return TWDR;
      734:	83 b1       	in	r24, 0x03	; 3
-}
      736:	08 95       	ret
 
 00000738 <TWI_ReceiveNACK>:
-
-//Wait until NACK received. 
-uint8_t TWI_ReceiveNACK(void)
-{
-	TWCR = (1<<TWINT) | (1<<TWEN);
      738:	84 e8       	ldi	r24, 0x84	; 132
      73a:	86 bf       	out	0x36, r24	; 54
-
-	//Wait till reception is
-	while (!BitCheck(TWCR, TWINT));
      73c:	06 b6       	in	r0, 0x36	; 54
      73e:	07 fe       	sbrs	r0, 7
      740:	fd cf       	rjmp	.-6      	; 0x73c <TWI_ReceiveNACK+0x4>
-
-	//Return received data
-	return TWDR;
      742:	83 b1       	in	r24, 0x03	; 3
-}
      744:	08 95       	ret
 
 00000746 <stepper_init>:
@@ -1345,8 +1078,8 @@ void lcd_init(void)
      7e8:	8c e0       	ldi	r24, 0x0C	; 12
      7ea:	78 2f       	mov	r23, r24
      7ec:	85 83       	std	Z+5, r24	; 0x05
-    t.Year = 2023;
-     7ee:	87 ee       	ldi	r24, 0xE7	; 231
+    t.Year = 2024;
+     7ee:	88 ee       	ldi	r24, 0xE8	; 232
      7f0:	86 83       	std	Z+6, r24	; 0x06
      7f2:	97 e0       	ldi	r25, 0x07	; 7
      7f4:	97 83       	std	Z+7, r25	; 0x07
